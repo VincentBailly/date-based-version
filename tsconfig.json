@@ -1,0 +1,9 @@
+{
+  "compilerOptions": {
+    "module": "commonjs",
+    "rootDir": "src",
+    "outDir": "lib",
+    "target": "esnext"
+  },
+  "files": ["./src/index.ts"]
+}
