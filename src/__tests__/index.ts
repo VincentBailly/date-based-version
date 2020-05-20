@@ -85,6 +85,18 @@ describe("edge cases", () => {
 
     expect(() => setVersion(cwd)).toThrow();
   })
+
+  // This situation should not happen... but it could... so we test it.
+  it("throws if HEAD is a release branch but we can't find any version tag at all", () => {
+    const cwd = initRepo();
+
+    createCommit(cwd);
+    commandSync(`git checkout -b release/v1.20200510.2`, { cwd });
+
+    createCommit(cwd);
+
+    expect(() => setVersion(cwd)).toThrow();
+  })
 })
 
 describe("When previous version has not today's date", () => {
