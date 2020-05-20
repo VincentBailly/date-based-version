@@ -21,7 +21,7 @@ function bumpMinor(old: Version): Version {
   return { p1, p2, p3, p4 };
 }
 
-function parseVersion(versionString): Version {
+function parseVersion(versionString: string): Version {
   if (!versionTagRegExp.test(versionString)) {
     throw new Error("the version string does not match the version regexp");
   }
@@ -34,14 +34,23 @@ function parseVersion(versionString): Version {
   return { p1, p2, p3, p4 };
 }
 
-function getVersionZeroForToday(): string {
+function getTodayNumber(): number {
   const date = new Date(Date.now());
+  return parseInt(`${date.getFullYear()}${(date.getMonth()+1).toString().padStart(2, '0')}${date.getDate().toString().padStart(2, '0')}`);
+}
+
+function getFirstVersionForToday(): string {
   const p1 = 1;
-  const p2 = parseInt(`${date.getFullYear()}${(date.getMonth()+1).toString().padStart(2, '0')}${date.getDate().toString().padStart(2, '0')}`);
-  const p3 = 0;
+  const p2 = getTodayNumber();
+  const p3 = 1;
   const p4 = 0;
   return toString({p1,p2,p3,p4});
 
+}
+
+function isTagFromToday(versionString: string): boolean {
+  const p2 = parseInt(/v\d+\.(\d{8})\.\d+\.\d+/.exec(versionString)[1]);
+  return p2 === getTodayNumber();
 }
 
 export function setVersion (cwd) {
@@ -49,16 +58,26 @@ export function setVersion (cwd) {
     throw new Error("HEAD already has a version number");
   }
 
-  const currentVersion = parseVersion(getCurrentLatestVersion(cwd));
-  const newVersionTag = toString(bumpMinor(currentVersion));
+  const currentLatestVersionFromToday = tryGetCurrentLatestVersionFromToday(cwd);
+
+  const newVersionTag = Boolean(currentLatestVersionFromToday) ? toString(bumpMinor(currentLatestVersionFromToday)) : getFirstVersionForToday();
+
   commandSync(`git tag ${newVersionTag}`, { cwd });
 }
 
-export function getCurrentLatestVersion(cwd): string {
+export function tryGetCurrentLatestVersionFromToday(cwd): Version | undefined {
+    const latestVersionTag = getCurrentLatestVersion(cwd);
+    if (!latestVersionTag || !isTagFromToday(latestVersionTag)) {
+      return undefined;
+    }
+
+    return parseVersion(latestVersionTag);
+}
+
+export function getCurrentLatestVersion(cwd): string | undefined {
     const gitLogOutput = commandSync("git log --tags --date-order --format='%D'", { cwd }).stdout.toString();
     const gitLogOutputLines = gitLogOutput.split(/\r\n|\n|\r/g).filter(l => l !== "");
     const linesWithCorrectVersionTags = gitLogOutputLines.filter(l => versionTagRegExp.test(l));
-    const currentVersionTag = linesWithCorrectVersionTags.length === 0 ? getVersionZeroForToday() : versionTagRegExp.exec(linesWithCorrectVersionTags[0])[0];
 
-    return currentVersionTag;
+    return linesWithCorrectVersionTags.length > 0 ? versionTagRegExp.exec(linesWithCorrectVersionTags[0])[0] : undefined;
 }

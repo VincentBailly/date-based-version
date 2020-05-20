@@ -29,7 +29,7 @@ describe("When previous version has today's date", () => {
     commandSync(`git tag v1.20200510.2.0`, { cwd });
 
     createCommit(cwd);
-    commandSync(`git tag vincent`, { cwd });
+    commandSync(`git tag randomTag`, { cwd });
 
     // Act
     setVersion(cwd);
@@ -73,7 +73,23 @@ describe("edge cases", () => {
 
 describe("When previous version has not today's date", () => {
   it("creates a new version which contains today's date", () => {
-    throw new Error("Not implemented");
+    // Setup
+    jest.spyOn(global.Date, "now").mockImplementation(() => new Date("2020-05-10T11:01:58.135Z").valueOf());
+
+    const cwd = initRepo();
+
+    createCommit(cwd);
+    commandSync(`git tag v1.20200503.20.0`, { cwd });
+
+    createCommit(cwd);
+    commandSync(`git tag randomTag`, { cwd });
+
+    // Act
+    setVersion(cwd);
+
+    // Validate
+    const currentLatestVersion = getCurrentLatestVersion(cwd);
+    expect(currentLatestVersion).toBe("v1.20200510.1.0");
   })
 
   it("reset the third and fourth component", () => {
