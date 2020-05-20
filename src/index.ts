@@ -35,6 +35,10 @@ function parseVersion(versionString): Version {
 }
 
 export function setVersion (cwd) {
+  if (versionTagRegExp.test(commandSync("git log -1 --format='%D'", { cwd }).stdout.toString())) {
+    throw new Error("HEAD already has a version number");
+  }
+
   const currentVersion = parseVersion(getCurrentLatestVersion(cwd));
   const newVersionTag = toString(bumpMinor(currentVersion));
   commandSync(`git tag ${newVersionTag}`, { cwd });

@@ -42,7 +42,16 @@ describe("When previous version has today's date", () => {
 
 describe("edge cases", () => {
   it("thows if head already have a version tag", () => {
-    throw new Error("Not implemented");
+    // Setup
+    jest.spyOn(global.Date, "now").mockImplementation(() => new Date("2020-05-10T11:01:58.135Z").valueOf());
+
+    const cwd = initRepo();
+
+    createCommit(cwd);
+    commandSync(`git tag v1.20200510.2.0`, { cwd });
+
+    // Validate
+    expect(() => setVersion(cwd)).toThrow();
   });
 
   it ("creates a new tag if the git history does not contain any version tag", () => {
