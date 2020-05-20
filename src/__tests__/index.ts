@@ -133,8 +133,21 @@ describe("Creation of release branch", () => {
     expect(currenBranch).toBe("release/v1.20200510.3");
   });
 
-  it("does not happen for a patch build", () => {
-    throw new Error("Not implemented");
+  it("does not create a branch if HEAD is a release branch (case of patch build)", () => {
+    const cwd = initRepo();
+
+    createCommit(cwd);
+    commandSync(`git tag v1.20200510.2.0`, { cwd });
+    commandSync(`git checkout -b release/v1.20200510.2`, { cwd });
+
+    createCommit(cwd);
+
+    // Act
+    setVersion(cwd);
+
+    // Validate
+    const currenBranch = getCurrentBranch(cwd);
+    expect(currenBranch).toBe("release/v1.20200510.2");
   });
 })
 
