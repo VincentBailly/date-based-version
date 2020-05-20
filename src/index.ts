@@ -82,7 +82,10 @@ export function setVersion (cwd) {
   const {p1,p2,p3} = parseVersion(newVersionTag);
   const newBranch = `release/v${p1}.${p2}.${p3}`;
 
-  commandSync(`git checkout -b ${newBranch}`, { cwd });
+  // we only create release branches off master
+  if (getCurrentBranch(cwd) === "master") {
+    commandSync(`git checkout -b ${newBranch}`, { cwd });
+  }
 }
 
 export function getCurrentLatestVersion(cwd): string | undefined {
