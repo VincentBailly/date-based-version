@@ -70,8 +70,20 @@ describe("edge cases", () => {
     expect(currentLatestVersion).toBe("v1.20200510.1.0");
   });
 
+  // This situation should not happen... but it could... so we test it.
   it("throws if HEAD is a release branch but we can't find any matching tag", () => {
-    throw new Error("Not implemented");
+    const cwd = initRepo();
+
+    createCommit(cwd);
+    commandSync(`git tag v1.20200510.2.0`, { cwd });
+    commandSync(`git checkout -b release/v1.20200510.2`, { cwd });
+
+    createCommit(cwd);
+    commandSync(`git tag v1.20200510.3.0`, { cwd });
+
+    createCommit(cwd);
+
+    expect(() => setVersion(cwd)).toThrow();
   })
 })
 
