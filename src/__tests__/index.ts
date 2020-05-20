@@ -69,6 +69,10 @@ describe("edge cases", () => {
     const currentLatestVersion = getCurrentLatestVersion(cwd);
     expect(currentLatestVersion).toBe("v1.20200510.1.0");
   });
+
+  it("throws if HEAD is a release branch but we can't find any matching tag", () => {
+    throw new Error("Not implemented");
+  })
 })
 
 describe("When previous version has not today's date", () => {
