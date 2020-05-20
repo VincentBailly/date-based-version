@@ -53,6 +53,15 @@ function isTagFromToday(versionString: string): boolean {
   return p2 === getTodayNumber();
 }
 
+function tryGetCurrentLatestVersionFromToday(cwd): Version | undefined {
+    const latestVersionTag = getCurrentLatestVersion(cwd);
+    if (!latestVersionTag || !isTagFromToday(latestVersionTag)) {
+      return undefined;
+    }
+
+    return parseVersion(latestVersionTag);
+}
+
 export function setVersion (cwd) {
   if (versionTagRegExp.test(commandSync("git log -1 --format='%D'", { cwd }).stdout.toString())) {
     throw new Error("HEAD already has a version number");
@@ -63,15 +72,6 @@ export function setVersion (cwd) {
   const newVersionTag = Boolean(currentLatestVersionFromToday) ? toString(bumpMinor(currentLatestVersionFromToday)) : getFirstVersionForToday();
 
   commandSync(`git tag ${newVersionTag}`, { cwd });
-}
-
-export function tryGetCurrentLatestVersionFromToday(cwd): Version | undefined {
-    const latestVersionTag = getCurrentLatestVersion(cwd);
-    if (!latestVersionTag || !isTagFromToday(latestVersionTag)) {
-      return undefined;
-    }
-
-    return parseVersion(latestVersionTag);
 }
 
 export function getCurrentLatestVersion(cwd): string | undefined {
