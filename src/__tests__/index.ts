@@ -55,7 +55,19 @@ describe("edge cases", () => {
   });
 
   it ("creates a new tag if the git history does not contain any version tag", () => {
-    throw new Error("Not implemented");
+    // Setup
+    jest.spyOn(global.Date, "now").mockImplementation(() => new Date("2020-05-10T11:01:58.135Z").valueOf());
+
+    const cwd = initRepo();
+
+    createCommit(cwd);
+
+    // Act
+    setVersion(cwd);
+
+    // Validate
+    const currentLatestVersion = getCurrentLatestVersion(cwd);
+    expect(currentLatestVersion).toBe("v1.20200510.1.0");
   });
 })
 

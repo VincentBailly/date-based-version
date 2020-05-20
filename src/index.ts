@@ -34,6 +34,16 @@ function parseVersion(versionString): Version {
   return { p1, p2, p3, p4 };
 }
 
+function getVersionZeroForToday(): string {
+  const date = new Date(Date.now());
+  const p1 = 1;
+  const p2 = parseInt(`${date.getFullYear()}${(date.getMonth()+1).toString().padStart(2, '0')}${date.getDate().toString().padStart(2, '0')}`);
+  const p3 = 0;
+  const p4 = 0;
+  return toString({p1,p2,p3,p4});
+
+}
+
 export function setVersion (cwd) {
   if (versionTagRegExp.test(commandSync("git log -1 --format='%D'", { cwd }).stdout.toString())) {
     throw new Error("HEAD already has a version number");
@@ -44,15 +54,11 @@ export function setVersion (cwd) {
   commandSync(`git tag ${newVersionTag}`, { cwd });
 }
 
-export function getCurrentLatestVersion(cwd) {
+export function getCurrentLatestVersion(cwd): string {
     const gitLogOutput = commandSync("git log --tags --date-order --format='%D'", { cwd }).stdout.toString();
     const gitLogOutputLines = gitLogOutput.split(/\r\n|\n|\r/g).filter(l => l !== "");
     const linesWithCorrectVersionTags = gitLogOutputLines.filter(l => versionTagRegExp.test(l));
-    if (linesWithCorrectVersionTags.length === 0) {
-      throw new Error("no valid version tag found in the git history");
-    }
-
-    const currentVersionTag = versionTagRegExp.exec(linesWithCorrectVersionTags[0])[0];
+    const currentVersionTag = linesWithCorrectVersionTags.length === 0 ? getVersionZeroForToday() : versionTagRegExp.exec(linesWithCorrectVersionTags[0])[0];
 
     return currentVersionTag;
 }
