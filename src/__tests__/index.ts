@@ -157,7 +157,20 @@ describe("Creation of release branch", () => {
 
 describe("When it is a patch build", () => {
   it("creates a version which is a bump of the fourth component compared to the previous version", () => {
-    throw new Error("Not implemented");
+    const cwd = initRepo();
+
+    createCommit(cwd);
+    commandSync(`git tag v1.20200512.2.0`, { cwd });
+    commandSync(`git checkout -b release/v1.20200512.2`, { cwd });
+
+    createCommit(cwd);
+
+    // Act
+    setVersion(cwd);
+
+    // Validate
+    const currentLatestVersion = getCurrentLatestVersion(cwd);
+    expect(currentLatestVersion).toBe("v1.20200512.2.1");
   })
 
 })
