@@ -40,7 +40,16 @@ describe("When previous version has today's date", () => {
   })
 });
 
-/*
+describe("edge cases", () => {
+  it("thows if head already have a version tag", () => {
+    throw new Error("Not implemented");
+  });
+
+  it ("creates a new tag if the git history does not contain any version tag", () => {
+    throw new Error("Not implemented");
+  });
+})
+
 describe("When previous version has not today's date", () => {
   it("creates a new version which contains today's date", () => {
     throw new Error("Not implemented");
@@ -67,4 +76,3 @@ describe("When it is a patch build", () => {
   })
 
 })
-*/
