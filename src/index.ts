@@ -1,4 +1,6 @@
 import { commandSync } from "execa";
+import { readFileSync } from "fs";
+import { join } from "path";
 
 const versionTagRegExp = /v\d+\.\d{8}\.\d+\.\d+/;
 
@@ -62,6 +64,10 @@ function tryGetCurrentLatestVersionFromToday(cwd): Version | undefined {
     return parseVersion(latestVersionTag);
 }
 
+export function getCurrentBranch(cwd): string {
+  return readFileSync(join(cwd, ".git", "HEAD")).toString().trim().replace("ref: refs/heads/","");
+}
+
 export function setVersion (cwd) {
   if (versionTagRegExp.test(commandSync("git log -1 --format='%D'", { cwd }).stdout.toString())) {
     throw new Error("HEAD already has a version number");
@@ -72,6 +78,11 @@ export function setVersion (cwd) {
   const newVersionTag = Boolean(currentLatestVersionFromToday) ? toString(bumpMinor(currentLatestVersionFromToday)) : getFirstVersionForToday();
 
   commandSync(`git tag ${newVersionTag}`, { cwd });
+
+  const {p1,p2,p3} = parseVersion(newVersionTag);
+  const newBranch = `release/v${p1}.${p2}.${p3}`;
+
+  commandSync(`git checkout -b ${newBranch}`, { cwd });
 }
 
 export function getCurrentLatestVersion(cwd): string | undefined {

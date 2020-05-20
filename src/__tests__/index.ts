@@ -2,7 +2,7 @@ import { directory as tmpDir } from "tempy";
 import { commandSync } from "execa";
 import { writeFileSync } from "fs";
 import { join } from "path";
-import { setVersion, getCurrentLatestVersion } from "../index";
+import { setVersion, getCurrentLatestVersion, getCurrentBranch } from "../index";
 
 function initRepo(): string {
     const cwd = tmpDir();
@@ -115,7 +115,22 @@ describe("When previous version has not today's date", () => {
 
 describe("Creation of release branch", () => {
   it("creates a release branch with the three first components of the version", () => {
-    throw new Error("Not implemented");
+    // Setup
+    jest.spyOn(global.Date, "now").mockImplementation(() => new Date("2020-05-10T11:01:58.135Z").valueOf());
+
+    const cwd = initRepo();
+
+    createCommit(cwd);
+    commandSync(`git tag v1.20200510.2.0`, { cwd });
+
+    createCommit(cwd);
+    commandSync(`git tag randomTag`, { cwd });
+
+    // Act
+    setVersion(cwd);
+
+    const currenBranch = getCurrentBranch(cwd);
+    expect(currenBranch).toBe("release/v1.20200510.3");
   });
 
   it("does not happen for a patch build", () => {
