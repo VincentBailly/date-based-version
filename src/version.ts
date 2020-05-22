@@ -8,27 +8,28 @@ export type Version = {
   p3: number;
   p4: number;
   toString: () => string;
-}
+};
 
-function makeVersion(p1: number, p2:number, p3: number, p4: number): Version {
-  return { p1, p2, p3, p4, toString: () => toString(p1, p2, p3, p4) }
-
+function makeVersion(p1: number, p2: number, p3: number, p4: number): Version {
+  return { p1, p2, p3, p4, toString: () => toString(p1, p2, p3, p4) };
 }
 
 function toString(p1: number, p2: number, p3: number, p4: number): string {
-  return  `v${p1}.${p2}.${p3}.${p4}`;
+  return `v${p1}.${p2}.${p3}.${p4}`;
 }
 
 export function tryGetLatestVersion(cwd: string): Version | undefined {
-    const tags = getTags(cwd);
-    const linesWithCorrectVersionTags = tags.filter(l => versionTagRegExp.test(l));
+  const tags = getTags(cwd);
+  const linesWithCorrectVersionTags = tags.filter((l) =>
+    versionTagRegExp.test(l)
+  );
 
-    if (linesWithCorrectVersionTags.length === 0) {
-      return undefined;
-    }
+  if (linesWithCorrectVersionTags.length === 0) {
+    return undefined;
+  }
 
-    const tag = versionTagRegExp.exec(linesWithCorrectVersionTags[0])[0];
-    return parseVersion(tag);
+  const tag = versionTagRegExp.exec(linesWithCorrectVersionTags[0])[0];
+  return parseVersion(tag);
 }
 
 export function tryParseVersion(versionString: string): Version | undefined {
@@ -66,10 +67,13 @@ export function bumpPatch(old: Version): Version {
   return makeVersion(p1, p2, p3, p4);
 }
 
-
 function getTodayNumber(): number {
   const date = new Date(Date.now());
-  return parseInt(`${date.getFullYear()}${(date.getMonth()+1).toString().padStart(2, '0')}${date.getDate().toString().padStart(2, '0')}`);
+  return parseInt(
+    `${date.getFullYear()}${(date.getMonth() + 1)
+      .toString()
+      .padStart(2, "0")}${date.getDate().toString().padStart(2, "0")}`
+  );
 }
 
 export function getVersionZeroForToday(): Version {
@@ -77,7 +81,7 @@ export function getVersionZeroForToday(): Version {
   const p2 = getTodayNumber();
   const p3 = 0;
   const p4 = 0;
-  return makeVersion(p1,p2,p3,p4);
+  return makeVersion(p1, p2, p3, p4);
 }
 
 export function isVersionFromToday(version: Version): boolean {

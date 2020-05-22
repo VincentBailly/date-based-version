@@ -1,13 +1,19 @@
 import { setVersion } from "../index";
 import { tryGetLatestVersion } from "../version";
-import { createNewRepo, getCurrentBranch, createCommit, tag, checkoutNewBranch } from "../git";
-
-
+import {
+  createNewRepo,
+  getCurrentBranch,
+  createCommit,
+  tag,
+  checkoutNewBranch,
+} from "../git";
 
 describe("When previous version has today's date", () => {
   it("creates a new version which is a simple bump of the third component", () => {
     // Setup
-    jest.spyOn(global.Date, "now").mockImplementation(() => new Date("2020-05-10T11:01:58.135Z").valueOf());
+    jest
+      .spyOn(global.Date, "now")
+      .mockImplementation(() => new Date("2020-05-10T11:01:58.135Z").valueOf());
 
     const cwd = createNewRepo();
 
@@ -23,13 +29,15 @@ describe("When previous version has today's date", () => {
     // Validate
     const currentLatestVersion = tryGetLatestVersion(cwd);
     expect(currentLatestVersion.toString()).toBe("v1.20200510.3.0");
-  })
+  });
 });
 
 describe("edge cases", () => {
   it("thows if head already have a version tag", () => {
     // Setup
-    jest.spyOn(global.Date, "now").mockImplementation(() => new Date("2020-05-10T11:01:58.135Z").valueOf());
+    jest
+      .spyOn(global.Date, "now")
+      .mockImplementation(() => new Date("2020-05-10T11:01:58.135Z").valueOf());
 
     const cwd = createNewRepo();
 
@@ -40,9 +48,11 @@ describe("edge cases", () => {
     expect(() => setVersion(cwd)).toThrow();
   });
 
-  it ("creates a new tag if the git history does not contain any version tag", () => {
+  it("creates a new tag if the git history does not contain any version tag", () => {
     // Setup
-    jest.spyOn(global.Date, "now").mockImplementation(() => new Date("2020-05-10T11:01:58.135Z").valueOf());
+    jest
+      .spyOn(global.Date, "now")
+      .mockImplementation(() => new Date("2020-05-10T11:01:58.135Z").valueOf());
 
     const cwd = createNewRepo();
 
@@ -70,7 +80,7 @@ describe("edge cases", () => {
     createCommit(cwd);
 
     expect(() => setVersion(cwd)).toThrow();
-  })
+  });
 
   // This situation should not happen... but it could... so we test it.
   it("throws if HEAD is a release branch but we can't find any version tag at all", () => {
@@ -82,7 +92,7 @@ describe("edge cases", () => {
     createCommit(cwd);
 
     expect(() => setVersion(cwd)).toThrow();
-  })
+  });
 
   // This situation should not happen... but it could... so we test it.
   it("throws if HEAD is neither master nor a release branch", () => {
@@ -94,13 +104,15 @@ describe("edge cases", () => {
     createCommit(cwd);
 
     expect(() => setVersion(cwd)).toThrow();
-  })
-})
+  });
+});
 
 describe("When previous version has not today's date", () => {
   it("creates a new version which contains today's date", () => {
     // Setup
-    jest.spyOn(global.Date, "now").mockImplementation(() => new Date("2020-05-10T11:01:58.135Z").valueOf());
+    jest
+      .spyOn(global.Date, "now")
+      .mockImplementation(() => new Date("2020-05-10T11:01:58.135Z").valueOf());
 
     const cwd = createNewRepo();
 
@@ -116,11 +128,13 @@ describe("When previous version has not today's date", () => {
     // Validate
     const currentLatestVersion = tryGetLatestVersion(cwd);
     expect(currentLatestVersion.toString()).toBe("v1.20200510.1.0");
-  })
+  });
 
   it("reset the third and fourth component", () => {
     // Setup
-    jest.spyOn(global.Date, "now").mockImplementation(() => new Date("2020-05-10T11:01:58.135Z").valueOf());
+    jest
+      .spyOn(global.Date, "now")
+      .mockImplementation(() => new Date("2020-05-10T11:01:58.135Z").valueOf());
 
     const cwd = createNewRepo();
 
@@ -136,13 +150,15 @@ describe("When previous version has not today's date", () => {
     // Validate
     const currentLatestVersion = tryGetLatestVersion(cwd);
     expect(currentLatestVersion.toString()).toBe("v1.20200510.1.0");
-  })
+  });
 });
 
 describe("Creation of release branch", () => {
   it("creates a release branch with the three first components of the version", () => {
     // Setup
-    jest.spyOn(global.Date, "now").mockImplementation(() => new Date("2020-05-10T11:01:58.135Z").valueOf());
+    jest
+      .spyOn(global.Date, "now")
+      .mockImplementation(() => new Date("2020-05-10T11:01:58.135Z").valueOf());
 
     const cwd = createNewRepo();
 
@@ -175,7 +191,7 @@ describe("Creation of release branch", () => {
     const currenBranch = getCurrentBranch(cwd);
     expect(currenBranch).toBe("release/v1.20200510.2");
   });
-})
+});
 
 describe("When it is a patch build", () => {
   it("creates a version which is a bump of the fourth component compared to the previous version", () => {
@@ -193,6 +209,5 @@ describe("When it is a patch build", () => {
     // Validate
     const currentLatestVersion = tryGetLatestVersion(cwd);
     expect(currentLatestVersion.toString()).toBe("v1.20200512.2.1");
-  })
-
-})
+  });
+});
