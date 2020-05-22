@@ -97,6 +97,18 @@ describe("edge cases", () => {
 
     expect(() => setVersion(cwd)).toThrow();
   })
+
+  // This situation should not happen... but it could... so we test it.
+  it("throws if HEAD is neither master nor a release branch", () => {
+    const cwd = initRepo();
+
+    createCommit(cwd);
+    commandSync(`git checkout -b featureBranch`, { cwd });
+
+    createCommit(cwd);
+
+    expect(() => setVersion(cwd)).toThrow();
+  })
 })
 
 describe("When previous version has not today's date", () => {
