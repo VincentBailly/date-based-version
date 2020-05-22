@@ -6,10 +6,18 @@ import {
   bumpMinor,
   bumpPatch,
 } from "./version";
-import { parseBranchName, toReleaseBranch } from "./branch";
-import { getTagsOfHead, checkoutNewBranch, getCurrentBranch, tag } from "./git";
+import { toReleaseBranch } from "./branch";
+import { getTagsOfHead, checkoutNewBranch, tag } from "./git";
 
-function setVersionImpl(cwd: string, dryRun: boolean) {
+export function setVersion(options: {
+  cwd: string;
+  dryRun?: boolean;
+  patch?: boolean;
+}) {
+  const { cwd } = options;
+  const dryRun = options.dryRun || false;
+  const patch = options.patch || false;
+
   const tagsOfHead = getTagsOfHead(cwd);
   const versionTagsOfHead = tagsOfHead
     .map((tag) => tryParseVersion(tag))
@@ -20,7 +28,7 @@ function setVersionImpl(cwd: string, dryRun: boolean) {
 
   const latestVersion = tryGetLatestVersion(cwd);
 
-  if (getCurrentBranch(cwd) === "master") {
+  if (!patch) {
     const currentLatestVersionFromToday = isVersionFromToday(latestVersion)
       ? latestVersion
       : getVersionZeroForToday();
@@ -46,17 +54,6 @@ function setVersionImpl(cwd: string, dryRun: boolean) {
       );
     }
 
-    const releaseBranch = parseBranchName(getCurrentBranch(cwd));
-    if (
-      latestVersion.p1 !== releaseBranch.p1 ||
-      latestVersion.p2 !== releaseBranch.p2 ||
-      latestVersion.p3 !== releaseBranch.p3
-    ) {
-      throw new Error(
-        "The latest version tag does not match with the current release branch"
-      );
-    }
-
     const newVersion = bumpPatch(latestVersion);
     if (dryRun) {
       console.log(`git tag ${newVersion.toString()}`);
@@ -64,13 +61,4 @@ function setVersionImpl(cwd: string, dryRun: boolean) {
       tag(newVersion.toString(), cwd);
     }
   }
-
-}
-
-export function setVersion(cwd: string) {
-  setVersionImpl(cwd, false);
-}
-
-export function dryRun(cwd: string) {
-  setVersionImpl(cwd, true);
 }

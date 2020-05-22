@@ -1,7 +1,6 @@
 #!/usr/bin/env node
-if (process.argv.includes("--dry-run")) {
-  require("../lib/index").dryRun(process.cwd());
-} else {
-  require("../lib/index").setVersion(process.cwd());
-}
 
+const dryRun = process.argv.includes("--dry-run");
+const patch = process.argv.includes("--patch");
+
+require("../lib/index").setVersion({ cwd: process.cwd(), dryRun, patch });

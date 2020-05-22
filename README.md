@@ -35,10 +35,16 @@ A git log command show such versioning strategy.
 
 Usage:
 
-Call this function from the release pipeline. It will detect whether it is on master or on
-a release branch and create the new version accordingly.
-The new version will be added as a tag and a release branch will be created if necessary.
+Call this function from the release pipeline.
+
+- The new version will be calculated based on the previous version, the date and the patch flag.
+- The commit will be tagged with the version.
+- If the --patch flag is not provided, a release branch will be created.
 
 ```
+# on master
 npx date-based-version
+
+# on a release branch
+npx date-based-version --patch
 ```

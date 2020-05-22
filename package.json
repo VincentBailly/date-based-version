@@ -1,32 +1,34 @@
 {
-  "name": "date-based-version",
   "private": true,
-  "version": "1.2.0",
+  "name": "date-based-version",
   "description": "Tool to generate date-based versions",
+  "license": "MIT",
+  "author": "Vincent Bailly",
   "repository": {
     "type": "git",
     "url": "https://github.com/VincentBailly/date-based-version"
   },
+  "version": "2.0.0",
   "main": "./lib/index.js",
-  "scripts": {
-    "build": "tsc",
-    "test": "jest ./src/__tests__",
-    "prettify": "prettier --write src",
-    "build-dist": "npx rimraf lib && pnpm run build && pnpm run test && node ./buildTools/create-dist.js"
-  },
-  "author": "Vincent Bailly",
   "bin": {
     "date-base-version": "./bin/setVersion.js"
   },
-  "license": "ISC",
+  "scripts": {
+    "build": "tsc",
+    "build-dist": "npx rimraf lib && pnpm run build && pnpm run test && node ./buildTools/create-dist.js",
+    "test": "jest ./src/__tests__",
+    "prettify": "prettier --write src bin README.md && prettier-package-json --write package.json"
+  },
   "dependencies": {
     "execa": "^4.0.1"
   },
   "devDependencies": {
     "@types/jest": "^25.2.3",
     "@types/node": "^12.0.0",
+    "fs-extra": "^9.0.0",
     "jest": "^26.0.1",
     "prettier": "^2.0.5",
+    "prettier-package-json": "^2.1.3",
     "tempy": "^0.5.0",
     "ts-jest": "^26.0.0",
     "typescript": "^3.9.2"

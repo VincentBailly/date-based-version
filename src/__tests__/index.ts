@@ -2,12 +2,7 @@ import { directory as tmpDir } from "tempy";
 import { commandSync } from "execa";
 import { setVersion } from "../index";
 import { tryGetLatestVersion } from "../version";
-import {
-  getCurrentBranch,
-  createCommit,
-  tag,
-  checkoutNewBranch,
-} from "../git";
+import { getCurrentBranch, createCommit, tag, checkoutNewBranch } from "../git";
 
 export function createNewRepo(): string {
   const cwd = tmpDir();
@@ -31,7 +26,7 @@ describe("When previous version has today's date", () => {
     tag(`randomTag`, cwd);
 
     // Act
-    setVersion(cwd);
+    setVersion({ cwd });
 
     // Validate
     const currentLatestVersion = tryGetLatestVersion(cwd);
@@ -52,7 +47,7 @@ describe("edge cases", () => {
     tag(`v1.20200510.2.0`, cwd);
 
     // Validate
-    expect(() => setVersion(cwd)).toThrow();
+    expect(() => setVersion({ cwd })).toThrow();
   });
 
   it("creates a new tag if the git history does not contain any version tag", () => {
@@ -66,51 +61,21 @@ describe("edge cases", () => {
     createCommit(cwd);
 
     // Act
-    setVersion(cwd);
+    setVersion({ cwd });
 
     // Validate
     const currentLatestVersion = tryGetLatestVersion(cwd);
     expect(currentLatestVersion.toString()).toBe("v1.20200510.1.0");
   });
 
-  // This situation should not happen... but it could... so we test it.
-  it("throws if HEAD is a release branch but we can't find any matching tag", () => {
+  it("throws if the patch option is passed but we can't find any version tag at all", () => {
     const cwd = createNewRepo();
 
     createCommit(cwd);
-    tag(`v1.20200510.2.0`, cwd);
-    checkoutNewBranch(`release/v1.20200510.2`, cwd);
-
-    createCommit(cwd);
-    tag(`v1.20200510.3.0`, cwd);
 
     createCommit(cwd);
 
-    expect(() => setVersion(cwd)).toThrow();
-  });
-
-  // This situation should not happen... but it could... so we test it.
-  it("throws if HEAD is a release branch but we can't find any version tag at all", () => {
-    const cwd = createNewRepo();
-
-    createCommit(cwd);
-    checkoutNewBranch(`release/v1.20200510.2`, cwd);
-
-    createCommit(cwd);
-
-    expect(() => setVersion(cwd)).toThrow();
-  });
-
-  // This situation should not happen... but it could... so we test it.
-  it("throws if HEAD is neither master nor a release branch", () => {
-    const cwd = createNewRepo();
-
-    createCommit(cwd);
-    checkoutNewBranch(`featureBranch`, cwd);
-
-    createCommit(cwd);
-
-    expect(() => setVersion(cwd)).toThrow();
+    expect(() => setVersion({ cwd, patch: true })).toThrow();
   });
 });
 
@@ -130,7 +95,7 @@ describe("When previous version has not today's date", () => {
     tag(`randomTag`, cwd);
 
     // Act
-    setVersion(cwd);
+    setVersion({ cwd });
 
     // Validate
     const currentLatestVersion = tryGetLatestVersion(cwd);
@@ -152,7 +117,7 @@ describe("When previous version has not today's date", () => {
     tag(`randomTag`, cwd);
 
     // Act
-    setVersion(cwd);
+    setVersion({ cwd });
 
     // Validate
     const currentLatestVersion = tryGetLatestVersion(cwd);
@@ -176,7 +141,7 @@ describe("Creation of release branch", () => {
     tag(`randomTag`, cwd);
 
     // Act
-    setVersion(cwd);
+    setVersion({ cwd });
 
     const currenBranch = getCurrentBranch(cwd);
     expect(currenBranch).toBe("release/v1.20200510.3");
@@ -192,7 +157,7 @@ describe("Creation of release branch", () => {
     createCommit(cwd);
 
     // Act
-    setVersion(cwd);
+    setVersion({ cwd, patch: true });
 
     // Validate
     const currenBranch = getCurrentBranch(cwd);
@@ -211,7 +176,7 @@ describe("When it is a patch build", () => {
     createCommit(cwd);
 
     // Act
-    setVersion(cwd);
+    setVersion({ cwd, patch: true });
 
     // Validate
     const currentLatestVersion = tryGetLatestVersion(cwd);
