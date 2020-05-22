@@ -15,4 +15,5 @@ fs.writeFileSync(path.join("dist", "package.json"), prettier.format(distributedP
 
 fsExtra.copySync("lib", path.join("dist", "lib"));
 fsExtra.copySync("bin", path.join("dist", "bin"));
+fsExtra.copySync("README.md", path.join("dist", "README.md"));
 
