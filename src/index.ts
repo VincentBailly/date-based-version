@@ -3,12 +3,19 @@ import { readFileSync } from "fs";
 import { join } from "path";
 
 const versionTagRegExp = /v\d+\.\d{8}\.\d+\.\d+/;
+const releaseBranchRegExp = /release\/v\d+\.\d{8}\.\d+/;
 
 type Version = {
   p1: number;
   p2: number;
   p3: number;
   p4: number;
+}
+
+type RelaseBranch = {
+  p1: number;
+  p2: number;
+  p3: number;
 }
 
 function toString(version: Version): string {
@@ -34,6 +41,18 @@ function parseVersion(versionString: string): Version {
   const p4 = parseInt(/v\d+\.\d{8}\.\d+\.(\d+)/.exec(versionString)[1]);
 
   return { p1, p2, p3, p4 };
+}
+
+function parseBranchName(branchName: string): RelaseBranch {
+  if (!releaseBranchRegExp.test(branchName)) {
+    throw new Error(`The branch ${branchName} is not a relase branch`);
+  }
+
+  const p1 = parseInt(/release\/v(\d+)\.\d{8}\.\d+/.exec(branchName)[1]);
+  const p2 = parseInt(/release\/v\d+\.(\d{8})\.\d+/.exec(branchName)[1]);
+  const p3 = parseInt(/release\/v\d+\.\d{8}\.(\d+)/.exec(branchName)[1]);
+
+  return { p1, p2, p3 };
 }
 
 function getTodayNumber(): number {
@@ -73,18 +92,30 @@ export function setVersion (cwd) {
     throw new Error("HEAD already has a version number");
   }
 
-  const currentLatestVersionFromToday = tryGetCurrentLatestVersionFromToday(cwd);
-
-  const newVersionTag = Boolean(currentLatestVersionFromToday) ? toString(bumpMinor(currentLatestVersionFromToday)) : getFirstVersionForToday();
-
-  commandSync(`git tag ${newVersionTag}`, { cwd });
-
-  const {p1,p2,p3} = parseVersion(newVersionTag);
-  const newBranch = `release/v${p1}.${p2}.${p3}`;
-
-  // we only create release branches off master
   if (getCurrentBranch(cwd) === "master") {
+    const currentLatestVersionFromToday = tryGetCurrentLatestVersionFromToday(cwd);
+
+    const newVersionTag = Boolean(currentLatestVersionFromToday) ? toString(bumpMinor(currentLatestVersionFromToday)) : getFirstVersionForToday();
+
+    commandSync(`git tag ${newVersionTag}`, { cwd });
+
+    const {p1,p2,p3} = parseVersion(newVersionTag);
+    const newBranch = `release/v${p1}.${p2}.${p3}`;
+
     commandSync(`git checkout -b ${newBranch}`, { cwd });
+  } else {
+    const oldTag = getCurrentLatestVersion(cwd);
+    if (!oldTag) {
+      throw new Error("The current branch does not have any version tag in its history");
+    }
+
+    const oldVersion = parseVersion(oldTag);
+
+    const releaseBranch = parseBranchName(getCurrentBranch(cwd));
+    if (oldVersion.p1 !== releaseBranch.p1 || oldVersion.p2 !== releaseBranch.p2 || oldVersion.p3 !== releaseBranch.p3) {
+      throw new Error("The latest version tag does not match with the current release branch")
+    }
+
   }
 }
 
