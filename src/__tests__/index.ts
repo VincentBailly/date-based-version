@@ -2,8 +2,9 @@ import { directory as tmpDir } from "tempy";
 import { commandSync } from "execa";
 import { writeFileSync } from "fs";
 import { join } from "path";
-import { setVersion, getCurrentBranch } from "../index";
+import { setVersion } from "../index";
 import { tryGetLatestVersion } from "../version";
+import { getCurrentBranch } from "../git";
 
 function initRepo(): string {
     const cwd = tmpDir();
