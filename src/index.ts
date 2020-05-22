@@ -30,6 +30,13 @@ function bumpMinor(old: Version): Version {
   return { p1, p2, p3, p4 };
 }
 
+function bumpPatch(old: Version): Version {
+  const { p1, p2, p3 } = old;
+  const p4 = old.p4 + 1;
+
+  return { p1, p2, p3, p4 };
+}
+
 function parseVersion(versionString: string): Version {
   if (!versionTagRegExp.test(versionString)) {
     throw new Error("the version string does not match the version regexp");
@@ -116,6 +123,8 @@ export function setVersion (cwd) {
       throw new Error("The latest version tag does not match with the current release branch")
     }
 
+    const newVersion = toString(bumpPatch(oldVersion));
+    commandSync(`git tag ${newVersion}`, { cwd });
   }
 }
 
