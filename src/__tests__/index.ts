@@ -2,7 +2,8 @@ import { directory as tmpDir } from "tempy";
 import { commandSync } from "execa";
 import { writeFileSync } from "fs";
 import { join } from "path";
-import { setVersion, getCurrentLatestVersion, getCurrentBranch } from "../index";
+import { setVersion, getCurrentBranch } from "../index";
+import { tryGetLatestVersion } from "../version";
 
 function initRepo(): string {
     const cwd = tmpDir();
@@ -35,8 +36,8 @@ describe("When previous version has today's date", () => {
     setVersion(cwd);
 
     // Validate
-    const currentLatestVersion = getCurrentLatestVersion(cwd);
-    expect(currentLatestVersion).toBe("v1.20200510.3.0");
+    const currentLatestVersion = tryGetLatestVersion(cwd);
+    expect(currentLatestVersion.toString()).toBe("v1.20200510.3.0");
   })
 });
 
@@ -66,8 +67,8 @@ describe("edge cases", () => {
     setVersion(cwd);
 
     // Validate
-    const currentLatestVersion = getCurrentLatestVersion(cwd);
-    expect(currentLatestVersion).toBe("v1.20200510.1.0");
+    const currentLatestVersion = tryGetLatestVersion(cwd);
+    expect(currentLatestVersion.toString()).toBe("v1.20200510.1.0");
   });
 
   // This situation should not happen... but it could... so we test it.
@@ -128,8 +129,8 @@ describe("When previous version has not today's date", () => {
     setVersion(cwd);
 
     // Validate
-    const currentLatestVersion = getCurrentLatestVersion(cwd);
-    expect(currentLatestVersion).toBe("v1.20200510.1.0");
+    const currentLatestVersion = tryGetLatestVersion(cwd);
+    expect(currentLatestVersion.toString()).toBe("v1.20200510.1.0");
   })
 
   it("reset the third and fourth component", () => {
@@ -148,8 +149,8 @@ describe("When previous version has not today's date", () => {
     setVersion(cwd);
 
     // Validate
-    const currentLatestVersion = getCurrentLatestVersion(cwd);
-    expect(currentLatestVersion).toBe("v1.20200510.1.0");
+    const currentLatestVersion = tryGetLatestVersion(cwd);
+    expect(currentLatestVersion.toString()).toBe("v1.20200510.1.0");
   })
 });
 
@@ -205,8 +206,8 @@ describe("When it is a patch build", () => {
     setVersion(cwd);
 
     // Validate
-    const currentLatestVersion = getCurrentLatestVersion(cwd);
-    expect(currentLatestVersion).toBe("v1.20200512.2.1");
+    const currentLatestVersion = tryGetLatestVersion(cwd);
+    expect(currentLatestVersion.toString()).toBe("v1.20200512.2.1");
   })
 
 })
