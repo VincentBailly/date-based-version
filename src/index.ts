@@ -9,7 +9,7 @@ import {
 import { parseBranchName, toReleaseBranch } from "./branch";
 import { getTagsOfHead, checkoutNewBranch, getCurrentBranch, tag } from "./git";
 
-export function setVersion(cwd) {
+function setVersionImpl(cwd: string, dryRun: boolean) {
   const tagsOfHead = getTagsOfHead(cwd);
   const versionTagsOfHead = tagsOfHead
     .map((tag) => tryParseVersion(tag))
@@ -27,10 +27,18 @@ export function setVersion(cwd) {
 
     const newVersion = bumpMinor(currentLatestVersionFromToday);
 
-    tag(newVersion.toString(), cwd);
+    if (dryRun) {
+      console.log(`git tag ${newVersion.toString()}`);
+    } else {
+      tag(newVersion.toString(), cwd);
+    }
 
     const newBranch = toReleaseBranch(newVersion);
-    checkoutNewBranch(newBranch.toString(), cwd);
+    if (dryRun) {
+      console.log(`git checkout -b ${newBranch.toString()}`);
+    } else {
+      checkoutNewBranch(newBranch.toString(), cwd);
+    }
   } else {
     if (!latestVersion) {
       throw new Error(
@@ -50,6 +58,19 @@ export function setVersion(cwd) {
     }
 
     const newVersion = bumpPatch(latestVersion);
-    tag(newVersion.toString(), cwd);
+    if (dryRun) {
+      console.log(`git tag ${newVersion.toString()}`);
+    } else {
+      tag(newVersion.toString(), cwd);
+    }
   }
+
+}
+
+export function setVersion(cwd: string) {
+  setVersionImpl(cwd, false);
+}
+
+export function dryRun(cwd: string) {
+  setVersionImpl(cwd, true);
 }

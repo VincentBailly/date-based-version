@@ -1,7 +1,7 @@
 {
   "name": "date-based-version",
   "private": true,
-  "version": "1.1.1",
+  "version": "1.2.0",
   "description": "Tool to generate date-based versions",
   "repository": {
     "type": "git",
@@ -12,7 +12,7 @@
     "build": "tsc",
     "test": "jest ./src/__tests__",
     "prettify": "prettier --write src",
-    "build-dist": "pnpm run build && pnpm run test && node ./buildTools/create-dist.js"
+    "build-dist": "npx rimraf lib && pnpm run build && pnpm run test && node ./buildTools/create-dist.js"
   },
   "author": "Vincent Bailly",
   "bin": {
