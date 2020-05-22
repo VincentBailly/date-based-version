@@ -1,37 +1,21 @@
-import { directory as tmpDir } from "tempy";
-import { commandSync } from "execa";
-import { writeFileSync } from "fs";
-import { join } from "path";
 import { setVersion } from "../index";
 import { tryGetLatestVersion } from "../version";
-import { getCurrentBranch } from "../git";
+import { createNewRepo, getCurrentBranch, createCommit, tag, checkoutNewBranch } from "../git";
 
-function initRepo(): string {
-    const cwd = tmpDir();
-    commandSync("git init", { cwd });
-    return cwd;
-}
 
-function createCommit(cwd): void {
-  const randomString = Math.random().toString();
-  writeFileSync(join(cwd, `${randomString}.txt`), randomString);
-    commandSync(`git add ${randomString}.txt`, { cwd });
-    commandSync(`git commit -m ${randomString}`, { cwd });
-
-}
 
 describe("When previous version has today's date", () => {
   it("creates a new version which is a simple bump of the third component", () => {
     // Setup
     jest.spyOn(global.Date, "now").mockImplementation(() => new Date("2020-05-10T11:01:58.135Z").valueOf());
 
-    const cwd = initRepo();
+    const cwd = createNewRepo();
 
     createCommit(cwd);
-    commandSync(`git tag v1.20200510.2.0`, { cwd });
+    tag(`v1.20200510.2.0`, cwd);
 
     createCommit(cwd);
-    commandSync(`git tag randomTag`, { cwd });
+    tag(`randomTag`, cwd);
 
     // Act
     setVersion(cwd);
@@ -47,10 +31,10 @@ describe("edge cases", () => {
     // Setup
     jest.spyOn(global.Date, "now").mockImplementation(() => new Date("2020-05-10T11:01:58.135Z").valueOf());
 
-    const cwd = initRepo();
+    const cwd = createNewRepo();
 
     createCommit(cwd);
-    commandSync(`git tag v1.20200510.2.0`, { cwd });
+    tag(`v1.20200510.2.0`, cwd);
 
     // Validate
     expect(() => setVersion(cwd)).toThrow();
@@ -60,7 +44,7 @@ describe("edge cases", () => {
     // Setup
     jest.spyOn(global.Date, "now").mockImplementation(() => new Date("2020-05-10T11:01:58.135Z").valueOf());
 
-    const cwd = initRepo();
+    const cwd = createNewRepo();
 
     createCommit(cwd);
 
@@ -74,14 +58,14 @@ describe("edge cases", () => {
 
   // This situation should not happen... but it could... so we test it.
   it("throws if HEAD is a release branch but we can't find any matching tag", () => {
-    const cwd = initRepo();
+    const cwd = createNewRepo();
 
     createCommit(cwd);
-    commandSync(`git tag v1.20200510.2.0`, { cwd });
-    commandSync(`git checkout -b release/v1.20200510.2`, { cwd });
+    tag(`v1.20200510.2.0`, cwd);
+    checkoutNewBranch(`release/v1.20200510.2`, cwd);
 
     createCommit(cwd);
-    commandSync(`git tag v1.20200510.3.0`, { cwd });
+    tag(`v1.20200510.3.0`, cwd);
 
     createCommit(cwd);
 
@@ -90,10 +74,10 @@ describe("edge cases", () => {
 
   // This situation should not happen... but it could... so we test it.
   it("throws if HEAD is a release branch but we can't find any version tag at all", () => {
-    const cwd = initRepo();
+    const cwd = createNewRepo();
 
     createCommit(cwd);
-    commandSync(`git checkout -b release/v1.20200510.2`, { cwd });
+    checkoutNewBranch(`release/v1.20200510.2`, cwd);
 
     createCommit(cwd);
 
@@ -102,10 +86,10 @@ describe("edge cases", () => {
 
   // This situation should not happen... but it could... so we test it.
   it("throws if HEAD is neither master nor a release branch", () => {
-    const cwd = initRepo();
+    const cwd = createNewRepo();
 
     createCommit(cwd);
-    commandSync(`git checkout -b featureBranch`, { cwd });
+    checkoutNewBranch(`featureBranch`, cwd);
 
     createCommit(cwd);
 
@@ -118,13 +102,13 @@ describe("When previous version has not today's date", () => {
     // Setup
     jest.spyOn(global.Date, "now").mockImplementation(() => new Date("2020-05-10T11:01:58.135Z").valueOf());
 
-    const cwd = initRepo();
+    const cwd = createNewRepo();
 
     createCommit(cwd);
-    commandSync(`git tag v1.20200503.20.0`, { cwd });
+    tag(`v1.20200503.20.0`, cwd);
 
     createCommit(cwd);
-    commandSync(`git tag randomTag`, { cwd });
+    tag(`randomTag`, cwd);
 
     // Act
     setVersion(cwd);
@@ -138,13 +122,13 @@ describe("When previous version has not today's date", () => {
     // Setup
     jest.spyOn(global.Date, "now").mockImplementation(() => new Date("2020-05-10T11:01:58.135Z").valueOf());
 
-    const cwd = initRepo();
+    const cwd = createNewRepo();
 
     createCommit(cwd);
-    commandSync(`git tag v1.20200503.20.8`, { cwd });
+    tag(`v1.20200503.20.8`, cwd);
 
     createCommit(cwd);
-    commandSync(`git tag randomTag`, { cwd });
+    tag(`randomTag`, cwd);
 
     // Act
     setVersion(cwd);
@@ -160,13 +144,13 @@ describe("Creation of release branch", () => {
     // Setup
     jest.spyOn(global.Date, "now").mockImplementation(() => new Date("2020-05-10T11:01:58.135Z").valueOf());
 
-    const cwd = initRepo();
+    const cwd = createNewRepo();
 
     createCommit(cwd);
-    commandSync(`git tag v1.20200510.2.0`, { cwd });
+    tag(`v1.20200510.2.0`, cwd);
 
     createCommit(cwd);
-    commandSync(`git tag randomTag`, { cwd });
+    tag(`randomTag`, cwd);
 
     // Act
     setVersion(cwd);
@@ -176,11 +160,11 @@ describe("Creation of release branch", () => {
   });
 
   it("does not create a branch if HEAD is a release branch (case of patch build)", () => {
-    const cwd = initRepo();
+    const cwd = createNewRepo();
 
     createCommit(cwd);
-    commandSync(`git tag v1.20200510.2.0`, { cwd });
-    commandSync(`git checkout -b release/v1.20200510.2`, { cwd });
+    tag(`v1.20200510.2.0`, cwd);
+    checkoutNewBranch(`release/v1.20200510.2`, cwd);
 
     createCommit(cwd);
 
@@ -195,11 +179,11 @@ describe("Creation of release branch", () => {
 
 describe("When it is a patch build", () => {
   it("creates a version which is a bump of the fourth component compared to the previous version", () => {
-    const cwd = initRepo();
+    const cwd = createNewRepo();
 
     createCommit(cwd);
-    commandSync(`git tag v1.20200512.2.0`, { cwd });
-    commandSync(`git checkout -b release/v1.20200512.2`, { cwd });
+    tag(`v1.20200512.2.0`, cwd);
+    checkoutNewBranch(`release/v1.20200512.2`, cwd);
 
     createCommit(cwd);
 

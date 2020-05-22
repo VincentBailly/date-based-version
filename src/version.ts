@@ -1,4 +1,4 @@
-import { commandSync } from "execa";
+import { getTags } from "./git";
 
 const versionTagRegExp = /v\d+\.\d{8}\.\d+\.\d+/;
 
@@ -20,9 +20,8 @@ function toString(p1: number, p2: number, p3: number, p4: number): string {
 }
 
 export function tryGetLatestVersion(cwd: string): Version | undefined {
-    const gitLogOutput = commandSync("git log --tags --date-order --format='%D'", { cwd }).stdout.toString();
-    const gitLogOutputLines = gitLogOutput.split(/\r\n|\n|\r/g).filter(l => l !== "");
-    const linesWithCorrectVersionTags = gitLogOutputLines.filter(l => versionTagRegExp.test(l));
+    const tags = getTags(cwd);
+    const linesWithCorrectVersionTags = tags.filter(l => versionTagRegExp.test(l));
 
     if (linesWithCorrectVersionTags.length === 0) {
       return undefined;

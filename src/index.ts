@@ -1,11 +1,12 @@
-import { commandSync } from "execa";
 import { tryParseVersion, tryGetLatestVersion, isVersionFromToday, getVersionZeroForToday, bumpMinor, bumpPatch } from "./version";
 import { parseBranchName, toReleaseBranch } from "./branch";
-import { getCurrentBranch } from "./git";
+import { getTagsOfHead, checkoutNewBranch, getCurrentBranch, tag } from "./git";
 
 
 export function setVersion (cwd) {
-  if (tryParseVersion(commandSync("git log -1 --format='%D'", { cwd }).stdout.toString())) {
+  const tagsOfHead = getTagsOfHead(cwd);
+  const versionTagsOfHead = tagsOfHead.map(tag => tryParseVersion(tag)).filter(t => t !== undefined);
+  if (versionTagsOfHead.length !== 0) {
     throw new Error("HEAD already has a version number");
   }
 
@@ -16,11 +17,11 @@ export function setVersion (cwd) {
 
     const newVersion = bumpMinor(currentLatestVersionFromToday);
 
-    commandSync(`git tag ${newVersion.toString()}`, { cwd });
+    tag(newVersion.toString(), cwd);
 
     const newBranch = toReleaseBranch(newVersion);
+    checkoutNewBranch(newBranch.toString(), cwd);
 
-    commandSync(`git checkout -b ${newBranch}`, { cwd });
   } else {
     if (!latestVersion) {
       throw new Error("The current branch does not have any version tag in its history");
@@ -32,6 +33,6 @@ export function setVersion (cwd) {
     }
 
     const newVersion = bumpPatch(latestVersion);
-    commandSync(`git tag ${newVersion.toString()}`, { cwd });
+    tag(newVersion.toString(), cwd);
   }
 }
