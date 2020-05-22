@@ -1,4 +1,3 @@
-import { directory as tmpDir } from "tempy";
 import { readFileSync } from "fs";
 import { writeFileSync } from "fs";
 import { join } from "path";
@@ -52,10 +51,4 @@ export function createCommit(cwd): void {
   writeFileSync(join(cwd, `${randomString}.txt`), randomString);
   commandSync(`git add ${randomString}.txt`, { cwd });
   commandSync(`git commit -m ${randomString}`, { cwd });
-}
-
-export function createNewRepo(): string {
-  const cwd = tmpDir();
-  commandSync("git init", { cwd });
-  return cwd;
 }

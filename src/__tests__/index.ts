@@ -1,12 +1,19 @@
+import { directory as tmpDir } from "tempy";
+import { commandSync } from "execa";
 import { setVersion } from "../index";
 import { tryGetLatestVersion } from "../version";
 import {
-  createNewRepo,
   getCurrentBranch,
   createCommit,
   tag,
   checkoutNewBranch,
 } from "../git";
+
+export function createNewRepo(): string {
+  const cwd = tmpDir();
+  commandSync("git init", { cwd });
+  return cwd;
+}
 
 describe("When previous version has today's date", () => {
   it("creates a new version which is a simple bump of the third component", () => {
