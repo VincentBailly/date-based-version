@@ -16,8 +16,16 @@ export function getTags(cwd): string[][] {
     "git log --tags --date-order --format='%D'",
     { cwd }
   ).stdout.toString();
-  const lines = gitLogOutput.split(/\r\n|\n|\r/g).filter((l) => l !== "");
-  return lines.map((l) => l.split(/,? ?tag: /).filter((t) => t !== ""));
+  const lines = gitLogOutput
+    .replace(/'/g, "")
+    .split(/\r\n|\n|\r/g)
+    .filter((l) => l !== "");
+  return lines.map((l) =>
+    l
+      .split(/, /)
+      .filter((t) => t.startsWith("tag: "))
+      .map((t) => t.replace("tag: ", ""))
+  );
 }
 
 export function tag(tagName: string, cwd: string): void {

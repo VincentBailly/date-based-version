@@ -20,15 +20,15 @@ function toString(p1: number, p2: number, p3: number, p4: number): string {
 
 export function tryGetLatestVersion(cwd: string): Version | undefined {
   const tags = getTags(cwd);
-  const linesWithCorrectVersionTags = tags.filter((l) =>
-    versionTagRegExp.test(l)
+  const linesWithCorrectVersionTags = tags.filter(
+    (l) => l.filter((t) => versionTagRegExp.test(t)).length === 1
   );
 
   if (linesWithCorrectVersionTags.length === 0) {
     return undefined;
   }
 
-  const tag = versionTagRegExp.exec(linesWithCorrectVersionTags[0])[0];
+  const tag = versionTagRegExp.exec(linesWithCorrectVersionTags[0][0])[0];
   return parseVersion(tag);
 }
 
