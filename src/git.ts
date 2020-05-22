@@ -8,9 +8,10 @@ export function getCurrentBranch(cwd): string {
   return readFileSync(join(cwd, ".git", "HEAD")).toString().trim().replace("ref: refs/heads/","");
 }
 
-export function getTags(cwd): string[] {
+export function getTags(cwd): string[][] {
     const gitLogOutput = commandSync("git log --tags --date-order --format='%D'", { cwd }).stdout.toString();
-    return gitLogOutput.split(/\r\n|\n|\r/g).filter(l => l !== "");
+    const lines = gitLogOutput.split(/\r\n|\n|\r/g).filter(l => l !== "");
+   return lines.map(l => l.split(/,? ?tag: /).filter(t => t !== ""));
 }
 
 export function tag(tagName: string, cwd: string): void {
