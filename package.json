@@ -1,5 +1,5 @@
 {
-  "name": "set-version",
+  "name": "date-based-version",
   "version": "1.0.0",
   "description": "Tool to generate date-based versions",
   "main": "./lib/index.js",
@@ -8,7 +8,10 @@
     "test": "jest ./src/__tests__",
     "prettify": "prettier --write src"
   },
-  "author": "",
+  "author": "Vincent Bailly",
+  "bin": {
+    "date-base-version": "./bin/setVersion.js"
+  },
   "license": "ISC",
   "dependencies": {
     "execa": "^4.0.1",
