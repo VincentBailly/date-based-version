@@ -1,12 +1,18 @@
 {
   "name": "date-based-version",
+  "private": true,
   "version": "1.0.0",
   "description": "Tool to generate date-based versions",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/VincentBailly/date-based-version"
+  },
   "main": "./lib/index.js",
   "scripts": {
     "build": "tsc",
     "test": "jest ./src/__tests__",
-    "prettify": "prettier --write src"
+    "prettify": "prettier --write src",
+    "build-dist": "pnpm run build && pnpm run test && node ./buildTools/create-dist.js"
   },
   "author": "Vincent Bailly",
   "bin": {
