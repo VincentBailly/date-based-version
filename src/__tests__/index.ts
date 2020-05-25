@@ -182,4 +182,27 @@ describe("When it is a patch build", () => {
     const currentLatestVersion = tryGetLatestVersion(cwd);
     expect(currentLatestVersion.toString()).toBe("v1.20200512.2.1");
   });
+
+  it("The version in other branches don't interfere with the patch build version", () => {
+    const cwd = createNewRepo();
+
+    createCommit(cwd);
+    tag(`v1.20200512.2.0`, cwd);
+    checkoutNewBranch(`release/v1.20200512.2`, cwd);
+
+    commandSync("git checkout master", { cwd });
+    createCommit(cwd);
+    tag(`v1.20200512.3.0`, cwd);
+
+    commandSync(`git checkout release/v1.20200512.2`, {cwd});
+
+    createCommit(cwd);
+
+    // Act
+    setVersion({ cwd, patch: true });
+
+    // Validate
+    const currentLatestVersion = tryGetLatestVersion(cwd);
+    expect(currentLatestVersion.toString()).toBe("v1.20200512.2.1");
+  });
 });

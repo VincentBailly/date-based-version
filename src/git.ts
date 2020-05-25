@@ -12,7 +12,7 @@ export function getCurrentBranch(cwd): string {
 
 export function getTags(cwd): string[][] {
   const gitLogOutput = commandSync(
-    "git log --tags --date-order --format='%D'",
+    "git log --format='%D'",
     { cwd }
   ).stdout.toString();
   const lines = gitLogOutput
