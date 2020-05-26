@@ -11,6 +11,27 @@ export function createNewRepo(): string {
 }
 
 describe("When previous version has today's date", () => {
+  it("returns the new version", () => {
+    // Setup
+    jest
+      .spyOn(global.Date, "now")
+      .mockImplementation(() => new Date("2020-05-10T11:01:58.135Z").valueOf());
+
+    const cwd = createNewRepo();
+
+    createCommit(cwd);
+    tag(`v1.20200510.2.0`, cwd);
+
+    createCommit(cwd);
+    tag(`randomTag`, cwd);
+
+    // Act
+    const version = setVersion({ cwd });
+
+    // Validate
+    expect(version).toBe("1.20200510.3.0");
+  });
+
   it("creates a new version which is a simple bump of the third component", () => {
     // Setup
     jest
