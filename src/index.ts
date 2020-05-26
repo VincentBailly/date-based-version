@@ -13,7 +13,7 @@ export function setVersion(options: {
   cwd: string;
   dryRun?: boolean;
   patch?: boolean;
-}) {
+}): string {
   const { cwd } = options;
   const dryRun = options.dryRun || false;
   const patch = options.patch || false;
@@ -36,9 +36,9 @@ export function setVersion(options: {
     const newVersion = bumpMinor(currentLatestVersionFromToday);
 
     if (dryRun) {
-      console.log(`git tag ${newVersion.toString()}`);
+      console.log(`git tag ${newVersion.getTag()}`);
     } else {
-      tag(newVersion.toString(), cwd);
+      tag(newVersion.getTag(), cwd);
     }
 
     const newBranch = toReleaseBranch(newVersion);
@@ -47,6 +47,7 @@ export function setVersion(options: {
     } else {
       checkoutNewBranch(newBranch.toString(), cwd);
     }
+    return newVersion.getVersion();
   } else {
     if (!latestVersion) {
       throw new Error(
@@ -56,9 +57,10 @@ export function setVersion(options: {
 
     const newVersion = bumpPatch(latestVersion);
     if (dryRun) {
-      console.log(`git tag ${newVersion.toString()}`);
+      console.log(`git tag ${newVersion.getTag()}`);
     } else {
-      tag(newVersion.toString(), cwd);
+      tag(newVersion.getTag(), cwd);
     }
+    return newVersion.getVersion();
   }
 }

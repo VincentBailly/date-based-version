@@ -51,7 +51,7 @@ describe("When previous version has today's date", () => {
 
     // Validate
     const currentLatestVersion = tryGetLatestVersion(cwd);
-    expect(currentLatestVersion.toString()).toBe("v1.20200510.3.0");
+    expect(currentLatestVersion.getTag()).toBe("v1.20200510.3.0");
   });
 });
 
@@ -86,7 +86,7 @@ describe("edge cases", () => {
 
     // Validate
     const currentLatestVersion = tryGetLatestVersion(cwd);
-    expect(currentLatestVersion.toString()).toBe("v1.20200510.1.0");
+    expect(currentLatestVersion.getTag()).toBe("v1.20200510.1.0");
   });
 
   it("throws if the patch option is passed but we can't find any version tag at all", () => {
@@ -120,7 +120,7 @@ describe("When previous version has not today's date", () => {
 
     // Validate
     const currentLatestVersion = tryGetLatestVersion(cwd);
-    expect(currentLatestVersion.toString()).toBe("v1.20200510.1.0");
+    expect(currentLatestVersion.getTag()).toBe("v1.20200510.1.0");
   });
 
   it("reset the third and fourth component", () => {
@@ -142,7 +142,7 @@ describe("When previous version has not today's date", () => {
 
     // Validate
     const currentLatestVersion = tryGetLatestVersion(cwd);
-    expect(currentLatestVersion.toString()).toBe("v1.20200510.1.0");
+    expect(currentLatestVersion.getTag()).toBe("v1.20200510.1.0");
   });
 });
 
@@ -201,7 +201,7 @@ describe("When it is a patch build", () => {
 
     // Validate
     const currentLatestVersion = tryGetLatestVersion(cwd);
-    expect(currentLatestVersion.toString()).toBe("v1.20200512.2.1");
+    expect(currentLatestVersion.getTag()).toBe("v1.20200512.2.1");
   });
 
   it("The version in other branches don't interfere with the patch build version", () => {
@@ -224,6 +224,6 @@ describe("When it is a patch build", () => {
 
     // Validate
     const currentLatestVersion = tryGetLatestVersion(cwd);
-    expect(currentLatestVersion.toString()).toBe("v1.20200512.2.1");
+    expect(currentLatestVersion.getTag()).toBe("v1.20200512.2.1");
   });
 });

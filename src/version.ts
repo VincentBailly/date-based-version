@@ -7,15 +7,20 @@ export type Version = {
   p2: number;
   p3: number;
   p4: number;
-  toString: () => string;
+  getTag: () => string;
+  getVersion: () => string;
 };
 
 function makeVersion(p1: number, p2: number, p3: number, p4: number): Version {
-  return { p1, p2, p3, p4, toString: () => toString(p1, p2, p3, p4) };
+  return { p1, p2, p3, p4, getTag: () => getTag(p1, p2, p3, p4), getVersion: () => getVersion(p1, p2, p3, p4) };
 }
 
-function toString(p1: number, p2: number, p3: number, p4: number): string {
+function getTag(p1: number, p2: number, p3: number, p4: number): string {
   return `v${p1}.${p2}.${p3}.${p4}`;
+}
+
+function getVersion(p1: number, p2: number, p3: number, p4: number): string {
+  return `${p1}.${p2}.${p3}.${p4}`;
 }
 
 export function tryGetLatestVersion(cwd: string): Version | undefined {

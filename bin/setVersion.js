@@ -3,4 +3,5 @@
 const dryRun = process.argv.includes("--dry-run");
 const patch = process.argv.includes("--patch");
 
-require("../index").setVersion({ cwd: process.cwd(), dryRun, patch });
+const version = require("../index").setVersion({ cwd: process.cwd(), dryRun, patch });
+console.log(version);
