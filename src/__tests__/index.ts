@@ -215,7 +215,7 @@ describe("When it is a patch build", () => {
     createCommit(cwd);
     tag(`v1.20200512.3.0`, cwd);
 
-    commandSync(`git checkout release/v1.20200512.2`, {cwd});
+    commandSync(`git checkout release/v1.20200512.2`, { cwd });
 
     createCommit(cwd);
 

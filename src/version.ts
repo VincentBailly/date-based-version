@@ -12,7 +12,14 @@ export type Version = {
 };
 
 function makeVersion(p1: number, p2: number, p3: number, p4: number): Version {
-  return { p1, p2, p3, p4, getTag: () => getTag(p1, p2, p3, p4), getVersion: () => getVersion(p1, p2, p3, p4) };
+  return {
+    p1,
+    p2,
+    p3,
+    p4,
+    getTag: () => getTag(p1, p2, p3, p4),
+    getVersion: () => getVersion(p1, p2, p3, p4),
+  };
 }
 
 function getTag(p1: number, p2: number, p3: number, p4: number): string {

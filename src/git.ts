@@ -11,10 +11,9 @@ export function getCurrentBranch(cwd): string {
 }
 
 export function getTags(cwd): string[][] {
-  const gitLogOutput = commandSync(
-    "git log --format='%D'",
-    { cwd }
-  ).stdout.toString();
+  const gitLogOutput = commandSync("git log --format='%D'", {
+    cwd,
+  }).stdout.toString();
   const lines = gitLogOutput
     .replace(/'/g, "")
     .split(/\r\n|\n|\r/g)
