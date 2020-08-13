@@ -5,6 +5,11 @@ on:
       version:
         description: 'Version to publish'
         required: true
+      tag:
+        description: 'npm tag'
+        required: true
+        default: 'latest'
+        
 
 jobs:
   publish:
@@ -31,6 +36,6 @@ jobs:
     - name: build
       run: yarn build-dist
     - name: publish
-      run: cd dist ; npm publish
+      run: cd dist ; npm publish --tag ${{ github.event.inputs.tag}}
       env:
         NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
