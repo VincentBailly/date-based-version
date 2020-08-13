@@ -1,0 +1,15 @@
+name: Publish to npm feed
+
+on:
+  workflow_dispatch:
+    input:
+      version:
+        description: 'Version to publish'
+        required: true
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+    - run: |
+      echo "Publishing version ${{ github.event.inputs.version }}." 
