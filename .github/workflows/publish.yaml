@@ -2,7 +2,7 @@ name: Publish to npm feed
 
 on:
   workflow_dispatch:
-    input:
+    inputs:
       version:
         description: 'Version to publish'
         required: true
