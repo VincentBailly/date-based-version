@@ -25,3 +25,7 @@ jobs:
       run: cat package.json
     - name: build
       run: yarn build-dist
+    - name: publish
+      run: cd dist ; npm publish
+      env:
+        NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
