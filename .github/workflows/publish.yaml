@@ -10,5 +10,7 @@ jobs:
   publish:
     runs-on: ubuntu-latest
     steps:
-    - run: |
-        echo "Publishing version ${{ github.event.inputs.version }}." 
+    # Checks-out the repository under $GITHUB_WORKSPACE, so your job can access it
+    - uses: actions/checkout@v2
+    - name: yarn install
+      run: yarn
