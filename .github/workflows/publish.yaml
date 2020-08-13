@@ -14,5 +14,9 @@ jobs:
     - uses: actions/checkout@v2
     - name: yarn install
       run: yarn
+    - name: configure git
+      run: |
+        git config --global user.email github@ci.io
+        git config --global user.name 'Github CI'
     - name: build
       run: yarn build-dist
