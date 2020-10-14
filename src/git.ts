@@ -34,17 +34,6 @@ export function checkoutNewBranch(branchName: string, cwd: string): void {
   commandSync(`git checkout -b ${branchName}`, { cwd });
 }
 
-export function getTagsOfHead(cwd: string): string[] {
-  const logLine = commandSync("git log -1 --format='%D'", {
-    cwd,
-  }).stdout.toString();
-  const tags = logLine
-    .replace("HEAD -> master", "")
-    .split(", tag: ")
-    .filter((t) => t !== "");
-  return tags;
-}
-
 export function createCommit(cwd): void {
   const randomString = Math.random().toString();
   writeFileSync(join(cwd, `${randomString}.txt`), randomString);

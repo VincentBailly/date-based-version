@@ -71,7 +71,7 @@ describe("edge cases", () => {
     expect(() => setVersion({ cwd })).not.toThrow();
   });
 
-  it("return existing version if head already has a version tag", () => {
+  it("returns new version if head already has a version tag", () => {
     // Setup
     jest
       .spyOn(global.Date, "now")
@@ -83,7 +83,11 @@ describe("edge cases", () => {
     tag(`v1.20200510.2.0`, cwd);
 
     // Validate
-    expect(setVersion({ cwd })).toBe("1.20200510.2.0");
+    expect(setVersion({ cwd })).toBe("1.20200510.3.0");
+
+    debugger
+    const currentLatestVersion = tryGetLatestVersion(cwd);
+    expect(currentLatestVersion.getTag()).toBe("v1.20200510.3.0");
   });
 
 

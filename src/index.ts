@@ -1,5 +1,4 @@
 import {
-  tryParseVersion,
   tryGetLatestVersion,
   isVersionFromToday,
   getVersionZeroForToday,
@@ -7,7 +6,7 @@ import {
   bumpPatch,
 } from "./version";
 import { toReleaseBranch } from "./branch";
-import { getTagsOfHead, checkoutNewBranch, tag } from "./git";
+import { checkoutNewBranch, tag } from "./git";
 
 export function setVersion(options: {
   cwd: string;
@@ -17,14 +16,6 @@ export function setVersion(options: {
   const { cwd } = options;
   const dryRun = options.dryRun || false;
   const patch = options.patch || false;
-
-  const tagsOfHead = getTagsOfHead(cwd);
-  const versionTagsOfHead = tagsOfHead
-    .map((tag) => tryParseVersion(tag))
-    .filter((t) => t !== undefined);
-  if (versionTagsOfHead.length !== 0) {
-    return versionTagsOfHead[0].getVersion();
-  }
 
   const latestVersion = tryGetLatestVersion(cwd);
 

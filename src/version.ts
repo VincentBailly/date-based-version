@@ -33,23 +33,15 @@ function getVersion(p1: number, p2: number, p3: number, p4: number): string {
 export function tryGetLatestVersion(cwd: string): Version | undefined {
   const tags = getTags(cwd);
   const linesWithCorrectVersionTags = tags.filter(
-    (l) => l.filter((t) => versionTagRegExp.test(t)).length === 1
+    (l) => l.filter((t) => versionTagRegExp.test(t)).length > 0
   );
 
   if (linesWithCorrectVersionTags.length === 0) {
     return undefined;
   }
 
-  const tag = versionTagRegExp.exec(linesWithCorrectVersionTags[0][0])[0];
+  const tag = linesWithCorrectVersionTags[0].filter(t => versionTagRegExp.test(t)).map(t => versionTagRegExp.exec(t)[0]).sort().reverse()[0];
   return parseVersion(tag);
-}
-
-export function tryParseVersion(versionString: string): Version | undefined {
-  if (!versionTagRegExp.test(versionString)) {
-    return undefined;
-  }
-
-  return parseVersion(versionString);
 }
 
 function parseVersion(versionString: string): Version {
