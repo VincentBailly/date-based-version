@@ -23,7 +23,7 @@ export function setVersion(options: {
     .map((tag) => tryParseVersion(tag))
     .filter((t) => t !== undefined);
   if (versionTagsOfHead.length !== 0) {
-    throw new Error("HEAD already has a version number");
+    return versionTagsOfHead[0].getVersion();
   }
 
   const latestVersion = tryGetLatestVersion(cwd);
