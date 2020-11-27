@@ -3,14 +3,14 @@ import { writeFileSync } from "fs";
 import { join } from "path";
 import { commandSync } from "execa";
 
-export function getCurrentBranch(cwd): string {
+export function getCurrentBranch(cwd: string): string {
   return readFileSync(join(cwd, ".git", "HEAD"))
     .toString()
     .trim()
     .replace("ref: refs/heads/", "");
 }
 
-export function getTags(cwd): string[][] {
+export function getTags(cwd: string): string[][] {
   const gitLogOutput = commandSync("git log --format='%D'", {
     cwd,
   }).stdout.toString();
@@ -34,7 +34,7 @@ export function checkoutNewBranch(branchName: string, cwd: string): void {
   commandSync(`git checkout -b ${branchName}`, { cwd });
 }
 
-export function createCommit(cwd): void {
+export function createCommit(cwd: string): void {
   const randomString = Math.random().toString();
   writeFileSync(join(cwd, `${randomString}.txt`), randomString);
   commandSync(`git add ${randomString}.txt`, { cwd });

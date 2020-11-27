@@ -47,4 +47,13 @@ npx date-based-version
 
 # on a release branch
 npx date-based-version --patch
+
+# dry run (won't create branch or tag)
+npx date-based-version --dry-run
+
+# scope tag by prefix (i.e. scope/v1.20200510.1.0)
+npx date-based-version --scopeTag=scope
+
+# scope branch by prefix (i.e. scope/release/v1.20200510.1)
+npx date-based-version --scopeBranch=scope
 ```

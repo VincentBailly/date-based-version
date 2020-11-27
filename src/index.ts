@@ -12,12 +12,14 @@ export function setVersion(options: {
   cwd: string;
   dryRun?: boolean;
   patch?: boolean;
+  scopeTag?: string;
+  scopeBranch?: string;
 }): string {
-  const { cwd } = options;
+  const { cwd, scopeTag, scopeBranch } = options;
   const dryRun = options.dryRun || false;
   const patch = options.patch || false;
 
-  const latestVersion = tryGetLatestVersion(cwd);
+  const latestVersion = tryGetLatestVersion(cwd, scopeTag);
 
   if (!patch) {
     const currentLatestVersionFromToday = isVersionFromToday(latestVersion)
@@ -27,12 +29,12 @@ export function setVersion(options: {
     const newVersion = bumpMinor(currentLatestVersionFromToday);
 
     if (dryRun) {
-      console.log(`git tag ${newVersion.getTag()}`);
+      console.log(`git tag ${newVersion.getTag(scopeTag)}`);
     } else {
-      tag(newVersion.getTag(), cwd);
+      tag(newVersion.getTag(scopeTag), cwd);
     }
 
-    const newBranch = toReleaseBranch(newVersion);
+    const newBranch = toReleaseBranch(newVersion, scopeBranch);
     if (dryRun) {
       console.log(`git checkout -b ${newBranch.toString()}`);
     } else {
@@ -48,9 +50,9 @@ export function setVersion(options: {
 
     const newVersion = bumpPatch(latestVersion);
     if (dryRun) {
-      console.log(`git tag ${newVersion.getTag()}`);
+      console.log(`git tag ${newVersion.getTag(scopeTag)}`);
     } else {
-      tag(newVersion.getTag(), cwd);
+      tag(newVersion.getTag(scopeTag), cwd);
     }
     return newVersion.getVersion();
   }
