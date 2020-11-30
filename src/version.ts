@@ -7,7 +7,7 @@ export type Version = {
   p2: number;
   p3: number;
   p4: number;
-  getTag: () => string;
+  getTag: (scopeTag?: string) => string;
   getVersion: () => string;
 };
 
@@ -17,31 +17,53 @@ function makeVersion(p1: number, p2: number, p3: number, p4: number): Version {
     p2,
     p3,
     p4,
-    getTag: () => getTag(p1, p2, p3, p4),
+    getTag: (scopeTag?: string) => getTag(p1, p2, p3, p4, scopeTag),
     getVersion: () => getVersion(p1, p2, p3, p4),
   };
 }
 
-function getTag(p1: number, p2: number, p3: number, p4: number): string {
-  return `v${p1}.${p2}.${p3}.${p4}`;
+function getTag(
+  p1: number,
+  p2: number,
+  p3: number,
+  p4: number,
+  scopeTag?: string
+): string {
+  return `${scopeTag ? `${scopeTag}/` : ``}v${p1}.${p2}.${p3}.${p4}`;
 }
 
 function getVersion(p1: number, p2: number, p3: number, p4: number): string {
   return `${p1}.${p2}.${p3}.${p4}`;
 }
 
-export function tryGetLatestVersion(cwd: string): Version | undefined {
+export function tryGetLatestVersion(
+  cwd: string,
+  scopeTag?: string
+): Version | undefined {
   const tags = getTags(cwd);
-  const linesWithCorrectVersionTags = tags.filter(
-    (l) => l.filter((t) => versionTagRegExp.test(t)).length > 0
-  );
+  const linesWithCorrectVersionTags = tags
+    .map((l) => l.filter((t) => (scopeTag ? matchesScope(t, scopeTag) : true)))
+    .map((l) => l.map((t) => trimScope(t, scopeTag)))
+    .filter((l) => l.filter((t) => versionTagRegExp.test(t)).length > 0);
 
   if (linesWithCorrectVersionTags.length === 0) {
     return undefined;
   }
 
-  const tag = linesWithCorrectVersionTags[0].filter(t => versionTagRegExp.test(t)).map(t => versionTagRegExp.exec(t)[0]).sort().reverse()[0];
+  const tag = linesWithCorrectVersionTags[0]
+    .filter((t) => versionTagRegExp.test(t))
+    .map((t) => versionTagRegExp.exec(t)[0])
+    .sort()
+    .reverse()[0];
   return parseVersion(tag);
+}
+
+function matchesScope(versionString: string, scopeTag?: string): boolean {
+  return versionString.indexOf(`${scopeTag}/`) === 0;
+}
+
+function trimScope(versionString: string, scopeTag?: string): string {
+  return versionString.replace(`${scopeTag}/`, ``);
 }
 
 function parseVersion(versionString: string): Version {

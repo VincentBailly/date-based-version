@@ -2,7 +2,13 @@ import { directory as tmpDir } from "tempy";
 import { commandSync } from "execa";
 import { setVersion } from "../index";
 import { tryGetLatestVersion } from "../version";
-import { getCurrentBranch, createCommit, tag, checkoutNewBranch } from "../git";
+import {
+  getCurrentBranch,
+  getTags,
+  createCommit,
+  tag,
+  checkoutNewBranch,
+} from "../git";
 
 export function createNewRepo(): string {
   const cwd = tmpDir();
@@ -85,11 +91,10 @@ describe("edge cases", () => {
     // Validate
     expect(setVersion({ cwd })).toBe("1.20200510.3.0");
 
-    debugger
+    debugger;
     const currentLatestVersion = tryGetLatestVersion(cwd);
     expect(currentLatestVersion.getTag()).toBe("v1.20200510.3.0");
   });
-
 
   it("creates a new tag if the git history does not contain any version tag", () => {
     // Setup
@@ -245,5 +250,111 @@ describe("When it is a patch build", () => {
     // Validate
     const currentLatestVersion = tryGetLatestVersion(cwd);
     expect(currentLatestVersion.getTag()).toBe("v1.20200512.2.1");
+  });
+});
+
+describe("Scope tag", () => {
+  it("prefix tag with the scope when provided", () => {
+    // Setup
+    jest
+      .spyOn(global.Date, "now")
+      .mockImplementation(() => new Date("2020-05-10T11:01:58.135Z").valueOf());
+
+    const cwd = createNewRepo();
+
+    createCommit(cwd);
+    tag(`scope/v1.20200510.2.0`, cwd);
+    tag(`wrong-scope/v1.20200510.3.0`, cwd);
+
+    // Act
+    const scopeTag = "scope";
+    setVersion({ cwd, scopeTag });
+
+    const currentLatestVersion = tryGetLatestVersion(cwd, "scope");
+    expect(currentLatestVersion.getTag(scopeTag)).toBe("scope/v1.20200510.3.0");
+
+    const tags = getTags(cwd);
+    expect(tags[0]).toContain("scope/v1.20200510.3.0");
+  });
+
+  it("requires existing tags to be prefixed when scope is provided", () => {
+    // Setup
+    jest
+      .spyOn(global.Date, "now")
+      .mockImplementation(() => new Date("2020-05-10T11:01:58.135Z").valueOf());
+
+    const cwd = createNewRepo();
+
+    createCommit(cwd);
+    tag(`v1.20200510.2.0`, cwd);
+
+    // Act
+    const scopeTag = "scope";
+    setVersion({ cwd, scopeTag });
+
+    const currentLatestVersion = tryGetLatestVersion(cwd, "scope");
+    expect(currentLatestVersion.getTag(scopeTag)).toBe("scope/v1.20200510.1.0");
+
+    const tags = getTags(cwd);
+    expect(tags[0]).toContain("scope/v1.20200510.1.0");
+  });
+
+  it("create a tag without a prefix when no scope is provided", () => {
+    // Setup
+    jest
+      .spyOn(global.Date, "now")
+      .mockImplementation(() => new Date("2020-05-10T11:01:58.135Z").valueOf());
+
+    const cwd = createNewRepo();
+
+    createCommit(cwd);
+    tag(`v1.20200510.2.0`, cwd);
+
+    // Act
+    setVersion({ cwd });
+
+    const currentLatestVersion = tryGetLatestVersion(cwd);
+    expect(currentLatestVersion.getTag()).toBe("v1.20200510.3.0");
+
+    const tags = getTags(cwd);
+    expect(tags[0]).toContain("v1.20200510.3.0");
+  });
+});
+
+describe("Scope branch", () => {
+  it("prefix branch with the scope when provided", () => {
+    // Setup
+    jest
+      .spyOn(global.Date, "now")
+      .mockImplementation(() => new Date("2020-05-10T11:01:58.135Z").valueOf());
+
+    const cwd = createNewRepo();
+
+    createCommit(cwd);
+    tag(`v1.20200510.2.0`, cwd);
+
+    // Act
+    setVersion({ cwd, scopeBranch: "scope" });
+
+    const currenBranch = getCurrentBranch(cwd);
+    expect(currenBranch).toBe("scope/release/v1.20200510.3");
+  });
+
+  it("create a branch without a prefix when no scope is provided", () => {
+    // Setup
+    jest
+      .spyOn(global.Date, "now")
+      .mockImplementation(() => new Date("2020-05-10T11:01:58.135Z").valueOf());
+
+    const cwd = createNewRepo();
+
+    createCommit(cwd);
+    tag(`v1.20200510.2.0`, cwd);
+
+    // Act
+    setVersion({ cwd });
+
+    const currenBranch = getCurrentBranch(cwd);
+    expect(currenBranch).toBe("release/v1.20200510.3");
   });
 });
