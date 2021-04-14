@@ -8,7 +8,7 @@
     "type": "git",
     "url": "https://github.com/VincentBailly/date-based-version"
   },
-  "version": "2.4.0",
+  "version": "2.4.1",
   "bin": {
     "date-base-version": "./bin/setVersion.js"
   },
@@ -29,7 +29,7 @@
     "tempy": "^0.5.0",
     "ts-jest": "^26.0.0",
     "typescript": "^3.9.2",
-    "webpack": "^4.43.0",
-    "webpack-cli": "^3.3.11"
+    "webpack": "^5.32.0",
+    "webpack-cli": "^4.6.0"
   }
 }
