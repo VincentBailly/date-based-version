@@ -14,10 +14,12 @@ export function setVersion(options: {
   patch?: boolean;
   scopeTag?: string;
   scopeBranch?: string;
+  skipTagging?: boolean;
 }): string {
   const { cwd, scopeTag, scopeBranch } = options;
   const dryRun = options.dryRun || false;
   const patch = options.patch || false;
+  const skipTagging = options.skipTagging || false;
 
   const latestVersion = tryGetLatestVersion(cwd, scopeTag);
 
@@ -28,7 +30,7 @@ export function setVersion(options: {
 
     const newVersion = bumpMinor(currentLatestVersionFromToday);
 
-    if (dryRun) {
+    if (dryRun || skipTagging) {
       console.log(`git tag ${newVersion.getTag(scopeTag)}`);
     } else {
       tag(newVersion.getTag(scopeTag), cwd);
@@ -49,7 +51,7 @@ export function setVersion(options: {
     }
 
     const newVersion = bumpPatch(latestVersion);
-    if (dryRun) {
+    if (dryRun || skipTagging) {
       console.log(`git tag ${newVersion.getTag(scopeTag)}`);
     } else {
       tag(newVersion.getTag(scopeTag), cwd);
