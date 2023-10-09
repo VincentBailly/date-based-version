@@ -320,7 +320,6 @@ describe("Scope tag", () => {
     expect(tags[0]).toContain("v1.20200510.3.0");
   });
 });
-
 describe("Scope branch", () => {
   it("prefix branch with the scope when provided", () => {
     // Setup
@@ -356,5 +355,15 @@ describe("Scope branch", () => {
 
     const currenBranch = getCurrentBranch(cwd);
     expect(currenBranch).toBe("release/v1.20200510.3");
+  });
+});
+describe("skip tagging", () => {
+  it("should not tag when skipTagging is true", () => {
+    const cwd = createNewRepo();
+    const options = { cwd, skipTagging: true };
+    createCommit(cwd);
+    setVersion(options);
+    const tags = getTags(cwd);
+    expect(tags).not.toContain("v1.20200510.1.0");
   });
 });
