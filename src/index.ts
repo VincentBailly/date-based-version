@@ -14,12 +14,14 @@ export function setVersion(options: {
   patch?: boolean;
   scopeTag?: string;
   scopeBranch?: string;
+  iterateOnScope?: boolean;
 }): string {
   const { cwd, scopeTag, scopeBranch } = options;
   const dryRun = options.dryRun || false;
   const patch = options.patch || false;
+  const iterateOnScope = options.iterateOnScope || false;
 
-  const latestVersion = tryGetLatestVersion(cwd, scopeTag);
+  let latestVersion = tryGetLatestVersion(cwd, scopeTag);
 
   if (!patch) {
     const currentLatestVersionFromToday = isVersionFromToday(latestVersion)
@@ -42,6 +44,13 @@ export function setVersion(options: {
     }
     return newVersion.getVersion();
   } else {
+    if (!latestVersion && scopeTag && iterateOnScope) {
+      let subScope = scopeTag.split("/").slice(0, -1).join("/");
+      while (!latestVersion && subScope) {
+        latestVersion = tryGetLatestVersion(cwd, subScope);
+        subScope = subScope.split("/").slice(0, -1).join("/");
+      }
+    }
     if (!latestVersion) {
       throw new Error(
         "The current branch does not have any version tag in its history"

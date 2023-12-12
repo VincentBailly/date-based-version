@@ -358,3 +358,44 @@ describe("Scope branch", () => {
     expect(currenBranch).toBe("release/v1.20200510.3");
   });
 });
+
+describe("when patching with iterateOnScope set to true", () => {
+  it("The first commit to patch a scope needs to find the newest sub scope", () => {
+    // Setup
+    jest
+      .spyOn(global.Date, "now")
+      .mockImplementation(() => new Date("2023-12-12T10:01:58.135Z").valueOf());
+
+    const cwd = createNewRepo();
+
+    createCommit(cwd);
+    tag(`scope/v1.20231211.1.0`, cwd);
+    const scopeTag = "scope/package";
+
+    //Act
+    setVersion({ cwd, scopeTag, patch: true, iterateOnScope: true });
+
+    const tags = getTags(cwd);
+    expect(tags[0]).toContain("scope/package/v1.20231211.1.1");
+  });
+
+  it("All the non-first commits to patch a scope needs should use iterate on their respective scope", () => {
+    // Setup
+    jest
+      .spyOn(global.Date, "now")
+      .mockImplementation(() => new Date("2023-12-12T10:01:58.135Z").valueOf());
+
+    const cwd = createNewRepo();
+
+    createCommit(cwd);
+    tag(`scope/v1.20231211.1.0`, cwd);
+    tag(`scope/package/v1.20231211.1.1`, cwd);
+    const scopeTag = "scope/package";
+
+    //Act
+    setVersion({ cwd, scopeTag, patch: true, iterateOnScope: true });
+
+    const tags = getTags(cwd);
+    expect(tags[0]).toContain("scope/package/v1.20231211.1.2");
+  });
+});
