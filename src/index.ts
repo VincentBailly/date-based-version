@@ -45,10 +45,10 @@ export function setVersion(options: {
     return newVersion.getVersion();
   } else {
     if (!latestVersion && scopeTag && iterateOnScope) {
-      let subScope = scopeTag.split("/").slice(0, -1).join("/");
+      let subScope = getSubScope(scopeTag);
       while (!latestVersion && subScope) {
         latestVersion = tryGetLatestVersion(cwd, subScope);
-        subScope = subScope.split("/").slice(0, -1).join("/");
+        subScope = getSubScope(subScope);
       }
     }
     if (!latestVersion) {
@@ -65,4 +65,8 @@ export function setVersion(options: {
     }
     return newVersion.getVersion();
   }
+}
+
+function getSubScope(scope: string): string {
+  return scope.split("/").slice(0, -1).join("/");
 }
