@@ -369,7 +369,7 @@ describe("when patching with iterateOnScope set to true", () => {
     const scopeTag = "scope/package";
 
     //Act
-    setVersion({ cwd, scopeTag, patch: true, iterateOnScope: true });
+    setVersion({ cwd, scopeTag, patch: true });
 
     const tags = getTags(cwd);
     expect(tags[0]).toContain("scope/package/v1.20231211.1.1");
@@ -381,11 +381,12 @@ describe("when patching with iterateOnScope set to true", () => {
 
     createCommit(cwd);
     tag(`scope/v1.20231211.1.0`, cwd);
+    createCommit(cwd);
     tag(`scope/package/v1.20231211.1.1`, cwd);
     const scopeTag = "scope/package";
 
     //Act
-    setVersion({ cwd, scopeTag, patch: true, iterateOnScope: true });
+    setVersion({ cwd, scopeTag, patch: true });
 
     const tags = getTags(cwd);
     expect(tags[0]).toContain("scope/package/v1.20231211.1.2");

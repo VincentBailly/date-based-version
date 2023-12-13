@@ -14,12 +14,10 @@ export function setVersion(options: {
   patch?: boolean;
   scopeTag?: string;
   scopeBranch?: string;
-  iterateOnScope?: boolean;
 }): string {
   const { cwd, scopeTag, scopeBranch } = options;
   const dryRun = options.dryRun || false;
   const patch = options.patch || false;
-  const iterateOnScope = options.iterateOnScope || false;
 
   let latestVersion = tryGetLatestVersion(cwd, scopeTag);
 
@@ -44,7 +42,7 @@ export function setVersion(options: {
     }
     return newVersion.getVersion();
   } else {
-    if (!latestVersion && scopeTag && iterateOnScope) {
+    if (!latestVersion && scopeTag) {
       let subScope = getSubScope(scopeTag);
       while (!latestVersion && subScope) {
         latestVersion = tryGetLatestVersion(cwd, subScope);
