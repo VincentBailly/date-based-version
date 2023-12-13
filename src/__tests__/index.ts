@@ -362,10 +362,6 @@ describe("Scope branch", () => {
 describe("when patching with iterateOnScope set to true", () => {
   it("The first commit to patch a scope needs to find the newest sub scope", () => {
     // Setup
-    jest
-      .spyOn(global.Date, "now")
-      .mockImplementation(() => new Date("2023-12-12T10:01:58.135Z").valueOf());
-
     const cwd = createNewRepo();
 
     createCommit(cwd);
@@ -381,10 +377,6 @@ describe("when patching with iterateOnScope set to true", () => {
 
   it("All the non-first commits to patch a scope needs should use iterate on their respective scope", () => {
     // Setup
-    jest
-      .spyOn(global.Date, "now")
-      .mockImplementation(() => new Date("2023-12-12T10:01:58.135Z").valueOf());
-
     const cwd = createNewRepo();
 
     createCommit(cwd);
