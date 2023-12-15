@@ -5,7 +5,7 @@ const path = require("path");
 const prettier = require("prettier-package-json");
 const fsExtra = require("fs-extra");
 
-fs.rmdirSync("dist", { recursive: true });
+fs.rmSync("dist", { force: true, recursive: true });
 fs.mkdirSync("dist");
 
 const packageJson = require(path.join(process.cwd(), "package.json"));

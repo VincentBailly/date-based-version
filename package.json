@@ -29,7 +29,7 @@
     "tempy": "^0.5.0",
     "ts-jest": "^26.0.0",
     "typescript": "^3.9.2",
-    "webpack": "^5.32.0",
+    "webpack": "^5.89.0",
     "webpack-cli": "^4.6.0"
   }
 }
