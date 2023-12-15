@@ -40,6 +40,7 @@ Call this function from the release pipeline.
 - The new version will be calculated based on the previous version, the date and the patch flag.
 - The commit will be tagged with the version.
 - If the --patch flag is not provided, a release branch will be created.
+- When you provide a scope through the --scopeTag argument. It will iterate through all the sub scope until it finds a matching tag. This is particularly useful in a monorepo where you would wand to maintain multiple scope. Example your release pipeline produces the following tag: `release/v1.YearMonthDay.version` and you wish to patch a package using a different tag pattern. You can achieve this by calling `npx date-based-version --patch --scopedBranch=release/<team> --iterateOnScope` and you will get the following tag: `release/<team>/v1.YearMonthDay.version.patch`.
 
 ```
 # on master
